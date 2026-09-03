@@ -20,15 +20,51 @@ _FRESHER_PATTERN = re.compile(r"\bfresher(s)?\b", re.IGNORECASE)
 
 _QA_WORD_PATTERN = re.compile(r"\bqa\b", re.IGNORECASE)
 
+# Non-software domains jaha "Quality Analyst/QA" title kaam karti hai lekin
+# software testing se koi lena dena nahi hota (BPO, manufacturing,
+# call-center, hospitality, etc.) - inhe exclude karte hai.
+_NON_SOFTWARE_DOMAIN_KEYWORDS = [
+    "bpo", "call center", "call centre", "voice process", "non-voice",
+    "manufacturing", "production line", "shop floor", "garment", "textile",
+    "food safety", "food quality", "pharma quality", "warehouse",
+    "housekeeping", "hospitality", "hotel", "restaurant", "kitchen",
+    "customer support quality", "customer service quality",
+    "quality control inspector", "quality inspector", "welding",
+    "supply chain quality", "logistics quality", "civil quality",
+    "construction quality", "site quality", "field quality",
+]
+
+# In indicators mein se koi bhi mile to samajh lo ye genuinely software/tech
+# testing role hai, chahe non-software domain keyword bhi text me kahin ho
+# (jaise agar "pharma" company software QA hire kar rahi ho to bhi allow ho)
+_SOFTWARE_CONTEXT_KEYWORDS = [
+    "software", "application", "web app", "mobile app", "api testing",
+    "automation testing", "test automation", "selenium", "playwright",
+    "cypress", "appium", "sdet", "test case", "test script", "regression testing",
+    "bug tracking", "postman", "sql", "test plan", "qa engineer",
+    "quality assurance engineer", "software tester", "software testing",
+    "manual testing", "test engineer",
+]
+
 
 def is_qa_job(title: str, description: str = "") -> bool:
     text = f"{title} {description}".lower()
-    if any(keyword in text for keyword in QA_KEYWORDS):
-        return True
-    # Standalone "QA" word bhi match karo (e.g. "QA Manager", "QA Lead")
-    # word-boundary use kiya hai taaki "qa" kisi aur word ke andar (jaise
-    # "aqa" ya "sqa" jaisi cheez) galti se match na kare.
-    return bool(_QA_WORD_PATTERN.search(text))
+
+    matched_qa = any(keyword in text for keyword in QA_KEYWORDS) or bool(
+        _QA_WORD_PATTERN.search(text)
+    )
+    if not matched_qa:
+        return False
+
+    # Agar non-software domain ka signal hai, tabhi reject karo jab
+    # software/tech context ka koi indicator bhi na mile.
+    has_non_software_signal = any(kw in text for kw in _NON_SOFTWARE_DOMAIN_KEYWORDS)
+    has_software_signal = any(kw in text for kw in _SOFTWARE_CONTEXT_KEYWORDS)
+
+    if has_non_software_signal and not has_software_signal:
+        return False
+
+    return True
 
 
 def extract_experience(text: str):
