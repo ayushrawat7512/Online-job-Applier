@@ -1,0 +1,93 @@
+"""
+Entry point. Render pe ye script Cron Job / Background Worker ke andar
+periodically (har 30-45 min) chalegi. Har run me:
+  1. LinkedIn, Naukri, Indeed, Apna se jobs fetch karega
+  2. QA-relevance + experience (<=5 years) filter apply karega
+  3. Jo job pehle kabhi nahi bheji, usko Telegram pe bhejega
+  4. DB me mark kar dega taaki dobara na bheje
+"""
+import sys
+import time
+
+from db import init_db, already_sent, mark_sent
+from filters import is_qa_job, passes_experience_filter, extract_experience
+from notifier import send_job_alert, send_text
+from scrapers import linkedin, naukri, indeed, apna
+
+SCRAPERS = [
+    ("LinkedIn", linkedin.fetch_jobs),
+    ("Naukri", naukri.fetch_jobs),
+    ("Indeed", indeed.fetch_jobs),
+    ("Apna", apna.fetch_jobs),
+]
+
+
+def format_experience(job):
+    exp = extract_experience(job.get("description", "") or job.get("title", ""))
+    if exp is None:
+        return "Not specified"
+    low, high = exp
+    if low == 0 and high == 0:
+        return "Fresher"
+    if low == high:
+        return f"{low} yrs"
+    return f"{low}-{high} yrs"
+
+
+def run_once():
+    init_db()
+    total_new = 0
+
+    for name, fetch_fn in SCRAPERS:
+        print(f"--- Checking {name} ---")
+        try:
+            jobs = fetch_fn()
+        except Exception as e:
+            # Ek scraper fail ho to baaki chalte rahe - poori script crash na ho
+            print(f"[main] {name} scraper failed entirely: {e}")
+            continue
+
+        print(f"[main] {name}: {len(jobs)} raw results")
+        new_count = 0
+
+        for job in jobs:
+            link = job.get("link")
+            title = job.get("title", "")
+            description = job.get("description", "") or title
+
+            if not link:
+                continue
+            if already_sent(link):
+                continue
+            if not is_qa_job(title, description):
+                continue
+            if not passes_experience_filter(f"{title} {description}"):
+                continue
+
+            send_job_alert(
+                source=job["source"],
+                title=title,
+                company=job.get("company", "Unknown"),
+                location=job.get("location", ""),
+                experience_text=format_experience(job),
+                link=link,
+            )
+            mark_sent(job["source"], title, job.get("company", ""), link)
+            new_count += 1
+            total_new += 1
+            time.sleep(1)  # Telegram rate-limit ke against thoda gap
+
+        print(f"[main] {name}: {new_count} new jobs sent")
+
+    print(f"=== Done. Total new jobs sent this run: {total_new} ===")
+    return total_new
+
+
+if __name__ == "__main__":
+    try:
+        run_once()
+    except Exception as e:
+        # Agar poori script hi crash ho jaye to bhi ek Telegram alert mil jaye
+        print(f"[main] FATAL ERROR: {e}")
+        send_text(f"⚠️ QA Job Bot crashed: {e}")
+        sys.exit(1)

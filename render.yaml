@@ -1,0 +1,16 @@
+# Render Blueprint - is file ko use karke "New + Blueprint" se seedha
+# deploy ho sakta hai, ya manually bhi "Cron Job" service bana sakte ho
+# (README me dono tareeke likhe hai).
+services:
+  - type: cron
+    name: qa-job-alert-bot
+    runtime: python
+    plan: starter
+    schedule: "*/30 * * * *"   # har 30 minute me run
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
