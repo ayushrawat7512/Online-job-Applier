@@ -19,9 +19,9 @@ def send_job_alert(source: str, title: str, company: str, location: str,
     text = (
         f"🆕 *{title}*\n"
         f"🏢 {company}\n"
-        f"🎯 Experience: {experience_text or 'Not specified'}\n"
-        f"💰 Package: {salary_text or 'Not specified'}\n"
-        f"📍 {location or 'Not specified'}\n"
+        f"🎯 Experience: {experience_text or 'N/A'}\n"
+        f"💰 Package: {salary_text or 'N/A'}\n"
+        f"📍 {location or 'N/A'}\n"
         f"🔗 Source: {source}\n"
         f"👉 {link}"
     )

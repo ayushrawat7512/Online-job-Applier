@@ -28,7 +28,7 @@ SCRAPERS = [
 def format_experience(text):
     exp = extract_experience(text)
     if exp is None:
-        return "Not specified"
+        return "N/A"
     low, high = exp
     if low == 0 and high == 0:
         return "Fresher"

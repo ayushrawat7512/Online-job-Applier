@@ -9,9 +9,13 @@ Do filters:
 import re
 from config import QA_KEYWORDS, MAX_EXPERIENCE_YEARS
 
-# Patterns jaise: "2-5 years", "0-2 yrs", "3+ years", "fresher", "1 to 3 years"
+# Patterns jaise: "2-5 years", "0-2 yrs", "3+ years", "fresher", "1 to 3 years",
+# "minimum 2 years", "at least 3 yrs", "min. 4 years"
 _RANGE_PATTERN = re.compile(
     r"(\d+)\s*(?:-|to)\s*(\d+)\s*\+?\s*(?:years?|yrs?)", re.IGNORECASE
+)
+_MIN_PATTERN = re.compile(
+    r"(?:minimum|min\.?|at\s*least|over)\s*(\d+)\s*(?:years?|yrs?)", re.IGNORECASE
 )
 _PLUS_PATTERN = re.compile(r"(\d+)\s*\+\s*(?:years?|yrs?)", re.IGNORECASE)
 _SINGLE_PATTERN = re.compile(r"(\d+)\s*(?:years?|yrs?)", re.IGNORECASE)
@@ -78,6 +82,11 @@ def extract_experience(text: str):
     match = _RANGE_PATTERN.search(text)
     if match:
         return (int(match.group(1)), int(match.group(2)))
+
+    match = _MIN_PATTERN.search(text)
+    if match:
+        low = int(match.group(1))
+        return (low, low + 3)  # rough upper estimate
 
     match = _PLUS_PATTERN.search(text)
     if match:
