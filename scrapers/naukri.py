@@ -1,11 +1,12 @@
 """
-Naukri.com apna internal search API (jo unki website khud use karti hai)
-call karta hai. Ye bhi login ke bina public data hai. Naukri ko kuch
-specific headers chahiye (appid/systemid) warna 403 deta hai - ye headers
-publicly known hai aur Naukri ki website khud bhi yahi bhejti hai.
-
-Agar future me Naukri apna API change kare aur ye scraper fail ho, sabse
-pehle headers/endpoint check karna.
+IMPORTANT LIMITATION (as of testing): Naukri's job search API is
+reCAPTCHA-gated and returns HTTP 406 for plain requests-based calls -
+this needs a real headless browser + residential proxy to bypass
+reliably, which is beyond this lightweight script's scope. This
+scraper is kept as best-effort: if Naukri ever relaxes their
+protection or the headers below start working again, it'll pick back
+up automatically. For now expect 0 results from this source most of
+the time - LinkedIn is the reliable source.
 """
 import requests
 from datetime import datetime, timedelta, timezone

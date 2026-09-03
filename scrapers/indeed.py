@@ -1,11 +1,10 @@
 """
-IMPORTANT: Indeed baaki portals ke comparison me sabse zyada anti-bot
-protection (Cloudflare + rate limiting) use karta hai. Ye scraper
-"best-effort" hai - kabhi results milenge, kabhi Indeed block/challenge
-page bhej dega. Agar consistently 0 results aaye ya errors aaye, iska
-matlab Indeed ne current IP/pattern ko block kar diya - tab ye scraper
-skip ho jayega, baaki (LinkedIn/Naukri/Apna) chalte rahenge, script crash
-nahi hogi.
+IMPORTANT LIMITATION (as of testing): Indeed uses Cloudflare's managed
+bot-protection (Turnstile) which specifically targets datacenter IPs
+(like Render's servers) - even sophisticated headless-browser bypasses
+fail on datacenter IPs without a paid residential proxy service. This
+scraper is kept as best-effort: expect mostly 403s / 0 results from
+this source. LinkedIn remains the reliable source.
 """
 import requests
 from bs4 import BeautifulSoup

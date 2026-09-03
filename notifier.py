@@ -36,11 +36,6 @@ def _send(text: str):
         print("[notifier] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set, skipping send.")
         print(text)
         return
-
-    # DEBUG: token ko masked form me log karo taaki verify kar sake ki
-    # Render me exactly kya save hua hai (delete this block once fixed)
-    masked = TELEGRAM_BOT_TOKEN[:12] + "..." + TELEGRAM_BOT_TOKEN[-6:] if len(TELEGRAM_BOT_TOKEN) > 20 else "TOO_SHORT:" + TELEGRAM_BOT_TOKEN
-    print(f"[notifier][DEBUG] token_len={len(TELEGRAM_BOT_TOKEN)} masked={masked} chat_id={TELEGRAM_CHAT_ID}")
     try:
         resp = requests.post(
             TELEGRAM_API,

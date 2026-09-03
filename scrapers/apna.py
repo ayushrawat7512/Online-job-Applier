@@ -20,8 +20,9 @@ from bs4 import BeautifulSoup
 from config import MAX_RESULTS_PER_SOURCE, REQUEST_TIMEOUT, USER_AGENT
 
 CATEGORY_URLS = [
-    "https://apna.co/jobs/quality-assurance-jobs",
-    "https://apna.co/jobs/qa-jobs",
+    "https://apna.co/jobs/title_quality_assurance_engineer-jobs",
+    "https://apna.co/jobs/title_software_tester-jobs",
+    "https://apna.co/jobs/title_software_development_engineer_in_test",
 ]
 
 _EXP_PATTERN = re.compile(r"Min\.\s*(\d+)\s*years?", re.IGNORECASE)
