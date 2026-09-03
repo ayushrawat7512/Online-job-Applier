@@ -15,12 +15,13 @@ TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
 
 def send_job_alert(source: str, title: str, company: str, location: str,
-                    experience_text: str, link: str):
+                    experience_text: str, link: str, salary_text: str = None):
     text = (
         f"🆕 *{title}*\n"
         f"🏢 {company}\n"
-        f"📍 {location or 'Not specified'}\n"
         f"🎯 Experience: {experience_text or 'Not specified'}\n"
+        f"💰 Package: {salary_text or 'Not specified'}\n"
+        f"📍 {location or 'Not specified'}\n"
         f"🔗 Source: {source}\n"
         f"👉 {link}"
     )

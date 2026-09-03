@@ -72,3 +72,27 @@ def fetch_jobs():
             )
 
     return results
+
+
+def fetch_job_description(link: str) -> str:
+    """
+    Job ke individual page se poora job description text fetch karta hai
+    (guest/public view - login ke bina). Isse Experience aur Package jaisi
+    details nikalte hai jo search-results card me nahi hoti.
+    Best-effort: fail ho to khaali string return karta hai, poori script
+    crash nahi hoti.
+    """
+    headers = {"User-Agent": USER_AGENT}
+    try:
+        resp = requests.get(link, headers=headers, timeout=REQUEST_TIMEOUT)
+        if resp.status_code != 200:
+            return ""
+        soup = BeautifulSoup(resp.text, "html.parser")
+        desc_el = soup.find("div", class_="description__text") or soup.find(
+            "div", class_="show-more-less-html__markup"
+        )
+        if desc_el:
+            return desc_el.get_text(separator=" ", strip=True)
+    except requests.RequestException:
+        pass
+    return ""

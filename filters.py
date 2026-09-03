@@ -64,3 +64,51 @@ def passes_experience_filter(text: str) -> bool:
         return True
     min_years, _ = exp
     return min_years <= MAX_EXPERIENCE_YEARS
+
+
+# ---------- Salary / package extraction ----------
+# Common Indian formats: "₹5-8 LPA", "12 LPA", "₹40,000 - 50,000/month",
+# "5,00,000 - 8,00,000 per annum", "$60k - $80k"
+_LPA_RANGE_PATTERN = re.compile(
+    r"₹?\s*(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*LPA", re.IGNORECASE
+)
+_LPA_SINGLE_PATTERN = re.compile(r"₹?\s*(\d+(?:\.\d+)?)\s*LPA", re.IGNORECASE)
+_RUPEE_MONTH_PATTERN = re.compile(
+    r"₹\s*([\d,]+)\s*(?:-|to)\s*₹?\s*([\d,]+)\s*(?:per\s*month|/\s*month|a\s*month)",
+    re.IGNORECASE,
+)
+_RUPEE_ANNUM_PATTERN = re.compile(
+    r"₹\s*([\d,]+)\s*(?:-|to)\s*₹?\s*([\d,]+)\s*(?:per\s*annum|/\s*annum|p\.?a\.?)",
+    re.IGNORECASE,
+)
+_USD_K_RANGE_PATTERN = re.compile(
+    r"\$\s*(\d+)\s*[kK]\s*(?:-|to)\s*\$?\s*(\d+)\s*[kK]"
+)
+
+
+def extract_salary(text: str):
+    """Returns a human-readable salary/package string, or None if not found."""
+    if not text:
+        return None
+
+    m = _LPA_RANGE_PATTERN.search(text)
+    if m:
+        return f"₹{m.group(1)}-{m.group(2)} LPA"
+
+    m = _LPA_SINGLE_PATTERN.search(text)
+    if m:
+        return f"₹{m.group(1)} LPA"
+
+    m = _RUPEE_MONTH_PATTERN.search(text)
+    if m:
+        return f"₹{m.group(1)}-{m.group(2)} / month"
+
+    m = _RUPEE_ANNUM_PATTERN.search(text)
+    if m:
+        return f"₹{m.group(1)}-{m.group(2)} / annum"
+
+    m = _USD_K_RANGE_PATTERN.search(text)
+    if m:
+        return f"${m.group(1)}k-${m.group(2)}k"
+
+    return None

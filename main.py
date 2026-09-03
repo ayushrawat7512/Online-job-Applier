@@ -10,7 +10,7 @@ import sys
 import time
 
 from db import init_db, already_sent, mark_sent
-from filters import is_qa_job, passes_experience_filter, extract_experience
+from filters import is_qa_job, passes_experience_filter, extract_experience, extract_salary
 from notifier import send_job_alert, send_text
 from scrapers import linkedin, naukri, indeed, apna
 
@@ -25,8 +25,8 @@ SCRAPERS = [
 ]
 
 
-def format_experience(job):
-    exp = extract_experience(job.get("description", "") or job.get("title", ""))
+def format_experience(text):
+    exp = extract_experience(text)
     if exp is None:
         return "Not specified"
     low, high = exp
@@ -67,12 +67,26 @@ def run_once():
             if not passes_experience_filter(f"{title} {description}"):
                 continue
 
+            # Job bhejne layak hai - ab uska poora JD fetch karke real
+            # Experience aur Package nikalne ki koshish karo (sirf LinkedIn
+            # ke paas ye capability hai abhi; fail ho to title-level info
+            # pe hi fallback ho jata hai, alert phir bhi jayega)
+            full_text = description
+            if job["source"] == "LinkedIn":
+                try:
+                    jd = linkedin.fetch_job_description(link)
+                    if jd:
+                        full_text = jd
+                except Exception as e:
+                    print(f"[main] JD fetch failed for {link}: {e}")
+
             send_job_alert(
                 source=job["source"],
                 title=title,
                 company=job.get("company", "Unknown"),
                 location=job.get("location", ""),
-                experience_text=format_experience(job),
+                experience_text=format_experience(full_text),
+                salary_text=extract_salary(full_text),
                 link=link,
             )
             mark_sent(job["source"], title, job.get("company", ""), link)
