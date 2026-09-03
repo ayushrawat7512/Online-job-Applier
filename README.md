@@ -87,17 +87,21 @@ python main.py
 
 ## Kaise kaam karta hai
 
-- Har run me LinkedIn, Naukri, Indeed, Apna check hoti hai
+- Har 30 min me **LinkedIn** check hoti hai (guest/public search endpoint - login ke bina)
 - QA/Testing keyword match + "5 years se kam experience" filter lagta hai
 - Jo job pehle kabhi nahi bheji gayi (SQLite dedup DB), sirf wahi Telegram pe aati hai
 - Message format: Title, Company, Location, Experience, Source, Direct Link
 
-## Limitations (honest baat)
+## Sirf LinkedIn kyun (Naukri/Indeed/Apna disabled by design)
 
-- **LinkedIn/Naukri**: Zyada reliable, public search endpoints use karte hai
-- **Indeed**: Anti-bot protection strong hai - kabhi kabhi block ho sakta hai, tab wo source skip ho jayega but baaki chalte rahenge
-- **Apna**: Job cards me exact "posted X hours ago" nahi hota, isliye strict 24h filter nahi lagta - bas naye (pehle na-bheje gaye) jobs aate hai; title/company text bhi thoda mixed aata hai, link khol ke confirm karna
-- Kisi bhi portal ne apna website structure change kiya to us scraper ko update karna padega (`scrapers/` folder me respective file)
+Testing ke dauraan pata chala ki teeno platforms modern anti-bot / JS-rendering protection use karte hai jo bina paid residential proxy + real browser ke bypass nahi hoti:
+- **Naukri**: reCAPTCHA-gated API (HTTP 406)
+- **Indeed**: Cloudflare Turnstile, specifically datacenter IPs (jaisa Render) ko block karta hai (HTTP 403)
+- **Apna**: Listing pages JavaScript se render hoti hai, raw HTML me job links hote hi nahi
+
+Inko fix karne ke liye paid scraping service (ScrapFly/Apify, ~$0.50-$8 per 1000 results) chahiye hogi - abhi ke liye in teeno ko intentionally skip kiya gaya hai. Code `scrapers/` folder me maujood hai agar future me try karna ho, bas `main.py` ke `SCRAPERS` list me wapas enable kar dena.
+
+LinkedIn ka guest endpoint reliable hai aur bina kisi paid service ke consistently kaam karta hai - isliye yahi primary source hai.
 
 ## Cost kam rakhne ke liye
 

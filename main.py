@@ -16,9 +16,12 @@ from scrapers import linkedin, naukri, indeed, apna
 
 SCRAPERS = [
     ("LinkedIn", linkedin.fetch_jobs),
-    ("Naukri", naukri.fetch_jobs),
-    ("Indeed", indeed.fetch_jobs),
-    ("Apna", apna.fetch_jobs),
+    # Naukri, Indeed, Apna disabled - modern anti-bot/JS-rendering protection
+    # blocks them without a paid proxy service. See README for details.
+    # Uncomment below to re-enable if you set up a paid scraping service:
+    # ("Naukri", naukri.fetch_jobs),
+    # ("Indeed", indeed.fetch_jobs),
+    # ("Apna", apna.fetch_jobs),
 ]
 
 
