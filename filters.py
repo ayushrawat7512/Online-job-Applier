@@ -7,7 +7,7 @@ Do filters:
                                   taaki koi relevant job miss na ho - tum khud review kar lena)
 """
 import re
-from config import QA_KEYWORDS, MAX_EXPERIENCE_YEARS
+from config import QA_KEYWORDS, MAX_EXPERIENCE_YEARS, PRIORITY_LOCATION_KEYWORDS, PRIORITY_MAX_EXPERIENCE_YEARS
 
 # Patterns jaise: "2-5 years", "0-2 yrs", "3+ years", "fresher", "1 to 3 years",
 # "minimum 2 years", "at least 3 yrs", "min. 4 years"
@@ -109,6 +109,23 @@ def passes_experience_filter(text: str) -> bool:
         return True
     min_years, _ = exp
     return min_years <= MAX_EXPERIENCE_YEARS
+
+
+def is_priority_job(location: str, exp_tuple) -> bool:
+    """
+    Delhi NCR region (Delhi, Gurugram, Haryana, Faridabad, Ghaziabad, Noida,
+    Greater Noida) ki job hai aur experience requirement 2 years tak hai,
+    to True - is job ko "IMPORTANT" tag ke saath highlight karna hai.
+    Experience explicitly pata na ho to priority nahi maante (safe default).
+    """
+    if not location or exp_tuple is None:
+        return False
+    location_lower = location.lower()
+    is_ncr = any(kw in location_lower for kw in PRIORITY_LOCATION_KEYWORDS)
+    if not is_ncr:
+        return False
+    min_years, _ = exp_tuple
+    return min_years <= PRIORITY_MAX_EXPERIENCE_YEARS
 
 
 # ---------- Salary / package extraction ----------

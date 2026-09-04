@@ -10,7 +10,7 @@ import sys
 import time
 
 from db import init_db, already_sent, mark_sent
-from filters import is_qa_job, passes_experience_filter, extract_experience, extract_salary
+from filters import is_qa_job, passes_experience_filter, extract_experience, extract_salary, is_priority_job
 from notifier import send_job_alert, send_text
 from scrapers import linkedin, naukri, indeed, apna
 
@@ -88,6 +88,7 @@ def run_once():
                 experience_text=format_experience(full_text),
                 salary_text=extract_salary(full_text),
                 link=link,
+                is_priority=is_priority_job(job.get("location", ""), extract_experience(full_text)),
             )
             mark_sent(job["source"], title, job.get("company", ""), link)
             new_count += 1

@@ -30,6 +30,16 @@ MAX_RESULTS_PER_SOURCE = 25
 # rakhenge, "India" keyword use karenge jaha zaroori ho.
 SEARCH_LOCATION = "India"
 
+# ---------- Priority region (Delhi NCR) ----------
+# Inme se koi bhi jagah job location me mile aur experience requirement
+# PRIORITY_MAX_EXPERIENCE_YEARS se kam/equal ho, to us job ko "IMPORTANT"
+# tag ke saath alag se highlight karte hai.
+PRIORITY_LOCATION_KEYWORDS = [
+    "delhi", "ncr", "gurugram", "gurgaon", "haryana",
+    "faridabad", "ghaziabad", "noida", "greater noida",
+]
+PRIORITY_MAX_EXPERIENCE_YEARS = 2
+
 # ---------- Database ----------
 DB_PATH = os.environ.get("DB_PATH", "sent_jobs.db")
 

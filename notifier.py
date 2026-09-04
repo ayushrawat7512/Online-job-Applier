@@ -15,16 +15,29 @@ TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
 
 def send_job_alert(source: str, title: str, company: str, location: str,
-                    experience_text: str, link: str, salary_text: str = None):
-    text = (
-        f"🆕 *{title}*\n"
-        f"🏢 {company}\n"
-        f"🎯 Experience: {experience_text or 'N/A'}\n"
-        f"💰 Package: {salary_text or 'N/A'}\n"
-        f"📍 {location or 'N/A'}\n"
-        f"🔗 Source: {source}\n"
-        f"👉 {link}"
-    )
+                    experience_text: str, link: str, salary_text: str = None,
+                    is_priority: bool = False):
+    if is_priority:
+        text = (
+            f"⭐️ *IMPORTANT - NCR JOB (≤2 yrs exp)* ⭐️\n"
+            f"🆕 *{title}*\n"
+            f"🏢 {company}\n"
+            f"🎯 Experience: {experience_text or 'N/A'}\n"
+            f"💰 Package: {salary_text or 'N/A'}\n"
+            f"📍 *{location or 'N/A'}*\n"
+            f"🔗 Source: {source}\n"
+            f"👉 {link}"
+        )
+    else:
+        text = (
+            f"🆕 *{title}*\n"
+            f"🏢 {company}\n"
+            f"🎯 Experience: {experience_text or 'N/A'}\n"
+            f"💰 Package: {salary_text or 'N/A'}\n"
+            f"📍 {location or 'N/A'}\n"
+            f"🔗 Source: {source}\n"
+            f"👉 {link}"
+        )
     _send(text)
 
 
