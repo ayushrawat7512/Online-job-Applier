@@ -19,7 +19,7 @@ def send_job_alert(source: str, title: str, company: str, location: str,
                     is_priority: bool = False):
     if is_priority:
         text = (
-            f"⭐️ *IMPORTANT - NCR JOB (≤2 yrs exp)* ⭐️\n"
+            f"⭐️ *IMPORTANT - NCR JOB* ⭐️\n"
             f"🆕 *{title}*\n"
             f"🏢 {company}\n"
             f"🎯 Experience: {experience_text or 'N/A'}\n"

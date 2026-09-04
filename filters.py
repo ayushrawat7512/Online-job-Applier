@@ -119,16 +119,21 @@ def passes_experience_filter(text: str) -> bool:
 def is_priority_job(location: str, exp_tuple) -> bool:
     """
     Delhi NCR region (Delhi, Gurugram, Haryana, Faridabad, Ghaziabad, Noida,
-    Greater Noida) ki job hai aur experience requirement 2 years tak hai,
-    to True - is job ko "IMPORTANT" tag ke saath highlight karna hai.
-    Experience explicitly pata na ho to priority nahi maante (safe default).
+    Greater Noida) ki job hai, to True - is job ko "IMPORTANT" tag ke saath
+    highlight karna hai.
+    Experience explicitly <=2 years ho to highlight hoga hi. Experience N/A
+    (pata na ho) ho to bhi highlight hoga (location hi kaafi hai). Sirf tab
+    highlight NAHI hoga jab experience explicitly pata ho aur wo 2 years se
+    zyada ho (matlab confirm senior role hai).
     """
-    if not location or exp_tuple is None:
+    if not location:
         return False
     location_lower = location.lower()
     is_ncr = any(kw in location_lower for kw in PRIORITY_LOCATION_KEYWORDS)
     if not is_ncr:
         return False
+    if exp_tuple is None:
+        return True  # experience pata nahi - location hi kaafi hai
     min_years, _ = exp_tuple
     return min_years <= PRIORITY_MAX_EXPERIENCE_YEARS
 
