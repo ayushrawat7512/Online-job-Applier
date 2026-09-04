@@ -20,6 +20,7 @@ _MIN_PATTERN = re.compile(
 _PLUS_PATTERN = re.compile(r"(\d+)\s*\+\s*(?:years?|yrs?)", re.IGNORECASE)
 _SINGLE_PATTERN = re.compile(r"(\d+)\s*(?:years?|yrs?)", re.IGNORECASE)
 _FRESHER_PATTERN = re.compile(r"\bfresher(s)?\b", re.IGNORECASE)
+_ENTRY_LEVEL_PATTERN = re.compile(r"\bentry[\s-]?level\b", re.IGNORECASE)
 
 
 _QA_WORD_PATTERN = re.compile(r"\bqa\b", re.IGNORECASE)
@@ -78,6 +79,10 @@ def extract_experience(text: str):
 
     if _FRESHER_PATTERN.search(text):
         return (0, 0)
+
+    if _ENTRY_LEVEL_PATTERN.search(text):
+        # "Entry level" ka matlab generally 0-2 years hota hai
+        return (0, 2)
 
     match = _RANGE_PATTERN.search(text)
     if match:
