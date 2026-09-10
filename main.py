@@ -12,10 +12,13 @@ import time
 from db import init_db, already_sent, mark_sent
 from filters import is_qa_job, passes_experience_filter, extract_experience, extract_salary, is_priority_job
 from notifier import send_job_alert, send_text
-from scrapers import linkedin, naukri, indeed, apna
+from scrapers import linkedin, naukri, indeed, apna, greenhouse, lever, workday
 
 SCRAPERS = [
     ("LinkedIn", linkedin.fetch_jobs),
+    ("Greenhouse", greenhouse.fetch_jobs),
+    ("Lever", lever.fetch_jobs),
+    ("Workday", workday.fetch_jobs),
     # Naukri, Indeed, Apna disabled - modern anti-bot/JS-rendering protection
     # blocks them without a paid proxy service. See README for details.
     # Uncomment below to re-enable if you set up a paid scraping service:
