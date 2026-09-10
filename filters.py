@@ -52,24 +52,47 @@ _SOFTWARE_CONTEXT_KEYWORDS = [
 ]
 
 
+# Title me ye specific patterns mile to almost hamesha software/QA testing
+# role hoti hai - inhe "strong match" maante hai (extra confirmation ki
+# zaroorat nahi, sirf non-software domain exclusion check hota hai)
+_STRONG_TITLE_PATTERNS = [
+    "qa engineer", "sdet", "software tester", "test engineer",
+    "automation tester", "manual tester", "qa automation",
+    "test automation engineer", "quality assurance engineer",
+    "software testing", "qa lead", "test lead", "testing engineer",
+    "qa analyst", "test analyst",
+]
+
+
 def is_qa_job(title: str, description: str = "") -> bool:
+    title_lower = title.lower()
     text = f"{title} {description}".lower()
 
-    matched_qa = any(keyword in text for keyword in QA_KEYWORDS) or bool(
-        _QA_WORD_PATTERN.search(text)
-    )
-    if not matched_qa:
-        return False
-
-    # Agar non-software domain ka signal hai, tabhi reject karo jab
-    # software/tech context ka koi indicator bhi na mile.
     has_non_software_signal = any(kw in text for kw in _NON_SOFTWARE_DOMAIN_KEYWORDS)
     has_software_signal = any(kw in text for kw in _SOFTWARE_CONTEXT_KEYWORDS)
 
-    if has_non_software_signal and not has_software_signal:
-        return False
+    # Case 1: title me specific software-testing pattern hai (jaise "QA
+    # Engineer", "SDET") - ye itna specific hai ki extra confirmation nahi
+    # chahiye, sirf obvious non-software domain (BPO, manufacturing) exclude
+    # karo.
+    if any(pattern in title_lower for pattern in _STRONG_TITLE_PATTERNS):
+        if has_non_software_signal and not has_software_signal:
+            return False
+        return True
 
-    return True
+    # Case 2: title me sirf generic "Quality Assurance"/"Quality Analyst"/
+    # standalone "QA" hai (jaise "Trust & Safety QA", "Content Quality
+    # Analyst", "Data QA") - ye company career pages pe bahut common hai aur
+    # zyada tar software testing se related NAHI hota. Isliye yaha software
+    # context ka explicit confirmation zaroori hai, warna reject.
+    generic_match = (
+        any(keyword in title_lower for keyword in QA_KEYWORDS)
+        or bool(_QA_WORD_PATTERN.search(title_lower))
+    )
+    if generic_match:
+        return has_software_signal
+
+    return False
 
 
 def extract_experience(text: str):
